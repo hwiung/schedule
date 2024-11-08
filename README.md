@@ -200,7 +200,7 @@ API, ERD, SQL을 만들어서 기초적인 설계를 작업을하여 API 설계�
 ![ERD Diagram](./erd-diagram.jpg)
 
 
-공통 적용 사항
+## 공통 적용 사항
     1. API 실행 및 테스트(포스트맨), Entity를 DTO에 담아서 반환하기.
         - Entity의 데이터를 API에 선택적으로 반환해야 하는 경우, 해당 반환 조건에 맞는 DTO 객체에 담아서 반환.
 
@@ -219,7 +219,7 @@ API, ERD, SQL을 만들어서 기초적인 설계를 작업을하여 API 설계�
         - ScheduleRepository 클래스의 save, findAll, findById 메서드에서 JDBC 코드를 작성 후, JdbcTemplate을 통해 SQL 쿼리를 사용하여 데이터 베이스에 연동함(JDBC를 직접적으로 사용).
             -> ScheduleService와 ScheduleController 클래스는 데이터 베이스에 연동된 데이터를 사용함(JDBC를 간접적으로 사용).
 
-Lv 1: 일정 생성 및 조회
+## Lv 1: 일정 생성 및 조회
     -> 전체 일정과 선택 일정을 조회
 
     1. ScheduleEntity 클래스
@@ -246,7 +246,7 @@ Lv 1: 일정 생성 및 조회
     5. ScheduleController 클래스
          -> 클라이언트의 요구 사항을 각 엔드포인트에서 처리하여 응답을 반환한다.
 
-Lv 2: 비밀번호 확인을 통해 일정 수정 및 삭제 기능을 구현. 이때, 비밀번호가 맞는 경우에만 작업이 수행됨.
+## Lv 2: 비밀번호 확인을 통해 일정 수정 및 삭제 기능을 구현. 이때, 비밀번호가 맞는 경우에만 작업이 수행됨.
 
       1. ScheduleService에 수정 및 삭제 메서드 추가.
 
