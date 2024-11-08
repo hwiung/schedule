@@ -199,3 +199,57 @@ API, ERD, SQL을 만들어서 기초적인 설계를 작업을하여 API 설계�
 ```
 ![ERD Diagram](./erd-diagram.jpg)
 
+
+공통 적용 사항
+    1. API 실행 및 테스트(포스트맨), Entity를 DTO에 담아서 반환하기.
+        - Entity의 데이터를 API에 선택적으로 반환해야 하는 경우, 해당 반환 조건에 맞는 DTO 객체에 담아서 반환.
+
+    2. 일정 작성, 수정, 조회 시 비밀번호가 반환 되지 않게 하기.
+
+    3. 일정 수정 및 삭제 시 선택된 일정의 비밀번호와 수신 받은 비밀번호가 일치할 경우에만 결과가 반환 되게 하기.
+        - 비밀번호 불일치 시 적절한 오류 코드 및 메세지를 반환.
+
+    4. 일정 생성, 수정, 삭제 시 적절한 상태 코드를 반환.
+
+    5. 3 Layer Architecture.
+        - Controller, Service, Repositery 계층을 분리하여 구현.
+            -> 각각 가장 위, 중간, 가장 밑에 위치하며 각 계층은 상호작용을 함.
+
+    6. JDBC 사용
+        - ScheduleRepository 클래스의 save, findAll, findById 메서드에서 JDBC 코드를 작성 후, JdbcTemplate을 통해 SQL 쿼리를 사용하여 데이터 베이스에 연동함(JDBC를 직접적으로 사용).
+            -> ScheduleService와 ScheduleController 클래스는 데이터 베이스에 연동된 데이터를 사용함(JDBC를 간접적으로 사용).
+
+Lv 1: 일정 생성 및 조회
+    -> 전체 일정과 선택 일정을 조회
+
+    1. ScheduleEntity 클래스
+        -> 일정에 대한 정보를 저장
+
+        1-1. Getter와 Setter 메서드
+            -> 필드 값을 반환 및 설정
+
+    2. ScheduleDTO 클래스
+        -> 데이터 반환 시, 비밀번호는 제외하고 반환함.
+
+
+    3. ScheduleRepository 클래스
+        -> JdbcTemplate을 활용하여 자바에서 CRUD를 구현.
+
+              Create: 일정 생성 -> INSERT 쿼리를 사용하여 데이터베이스에 데이터를 추가.
+              Read: 전체 일정 조회 및 선택 일정 조회 -> SELECT 쿼리를 사용. 이때, RowMapper를 이용하여 데이터베이스의 데이터를 각 클래스의 객체로 Mapping한다.
+              Update: 선택 일정 수정 -> UPDATE 쿼리를 사용하여 id와 password를 확인 후, 데이터베이스에서 데이터를 수정함.
+              Delete: 선택 일정 삭제 -> DELETE 쿼리를 사용하여 id와 password를 확인 후, 데이터베이스에서 데이터를 삭제함.
+
+    4. ScheduleService 클래스
+         -> 일정 생성, 조회, 수정, 삭제 처리를 하는 비즈니스 로직을 구현.
+
+    5. ScheduleController 클래스
+         -> 클라이언트의 요구 사항을 각 엔드포인트에서 처리하여 응답을 반환한다.
+
+Lv 2: 비밀번호 확인을 통해 일정 수정 및 삭제 기능을 구현. 이때, 비밀번호가 맞는 경우에만 작업이 수행됨.
+
+      1. ScheduleService에 수정 및 삭제 메서드 추가.
+
+      2. ScheduleController에 수정 및 삭제 엔드포인트 추가.
+
+
