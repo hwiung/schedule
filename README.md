@@ -29,6 +29,16 @@
 }
 ```
 
+- 400 Bad Request (잘못된 입력 데이터 시)
+```json
+{
+  "status": 400,
+  "error": "Bad Request",
+  "message": "입력 데이터가 유효하지 않습니다."
+}
+
+```
+
 ### 2. 전체 일정 조회 API
 
 - **URL**: '/api/schdules'
