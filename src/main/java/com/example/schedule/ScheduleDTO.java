@@ -20,7 +20,7 @@ public class ScheduleDTO {
         this.updatedAt = updatedAt;
     }
 
-    // Getter만 생성 (변경 방지를 위해 setter는 제외)
+    // Getter만 생성 (변경 방지를 위해 Setter는 제외)
     public Long getId() {
         return id;
     }
