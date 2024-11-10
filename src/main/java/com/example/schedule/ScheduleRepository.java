@@ -3,10 +3,10 @@ package com.example.schedule;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 // Repository 어노테이션:
@@ -29,12 +29,30 @@ public class ScheduleRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    // 조건에 따른 쿼리 생성 및 매개변수 설정
+    public List<ScheduleEntity> findAll(String author, LocalDateTime updatedAt) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM schedule WHERE 1=1");
+        List<Object> params = new ArrayList<>();
 
-    // 일정 저장 메서드:
-    //  - ScheduleEntity 객체를 데잍베이스의 schedule 테이블에 저장함.
-    //  - 파라미터로 전달된 ScheduleEntity 객체의 필드 값을 사용하여 INSERT 쿼리를 실행하고, 데이터를 추가함.
+        if (author != null) {
+            sql.append(" AND author = ?");
+            params.add(author);
+        }
+
+        if (updatedAt != null) {
+            sql.append(" AND DATE(updatedAt) = ?");
+            params.add(updatedAt.toLocalDate()); // LocalDateTime의 날짜 부분만 비교
+        }
+
+        sql.append(" ORDER BY updatedAt DESC");
+
+        // 동적으로 생성한 매개변수를 전달하여 쿼리 실행
+        return jdbcTemplate.query(sql.toString(), params.toArray(), new ScheduleRowMapper());
+    }
+
+    // 일정 저장 메서드: ScheduleEntity 객체를 데이터베이스에 삽입
     public int save(ScheduleEntity schedule) {
-        String sql = "INSERT INTO schedule (task, author, password, createdAt, updatedAt) VALUES ( ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO schedule (task, author, password, creadtedAt, updatedAt) VALUES (?, ?, ?, ?, ?)";
         return jdbcTemplate.update(sql,
                 schedule.getTask(),
                 schedule.getAuthor(),
@@ -44,40 +62,15 @@ public class ScheduleRepository {
         );
     }
 
-    // 전체 일정 조회 메서드:
-    //  - 데이터베이스에서 전체 일정을 조회하고, 조건에 맞는 일정 목록을 반환함.
-    //  - 파라미터:
-    //      - author: 특정 작성자를 필터링하는 조건
-    //      - updatedAt: 특정 수정일을 필터링하는 조건
-    //  - 동작:
-    //      - 쿼리 작성 시 author와 updatedAt이 null이 아니면 해당 조건을 추가하여 필터링함.
-    //      - 조건이 없으면 전체 일정을 조회하고, 수정일 기준으로 내림차순 정렬함.
-    //  - 반환값: ScheduleEntity 객체 리스트
-    public List<ScheduleEntity> findAll(String author, LocalDateTime updatedAt) {
-        String sql = "SELECT * FROM schedule WHERE 1=1";
-
-        if (author != null) {
-            sql += " AND author = ?";
-        }
-
-        if (updatedAt != null) {
-            sql += " AND DATE(updatedAt) =?";
-        }
-
-        sql += " ORDER BY updatedAt DESC";
-
-        // JdbcTemplate의 query 메서드를 사용하여 SQL을 실행하고, RowMapper를 통해 결과를 매핑하여 반환함.
-        return jdbcTemplate.query(sql, new ScheduleRowMapper(), author, updatedAt);
-    }
-
-    // 특정 일정 조회 메서드
-    //  - 일정 ID를 통해 특정 일정을 조회하고, 해당 일정을 ScheduleEntity 객체로 변환함.
-    //  - 파라미터: id(조회할 일정의 고유 ID)
-    //  - 동작: SQL 쿼리로 ID 조건에 맞는 레코드를 조회하고, 단일 객체를 반환함.
-    //  - 반환값: 조회된 ScheduleEntity 객체
     public ScheduleEntity findById(Long id) {
         String sql = "SELECT * FROM schedule WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, new ScheduleRowMapper(), id);
+        List<ScheduleEntity> results = jdbcTemplate.query(sql, new Object[]{id}, new ScheduleRowMapper());
+
+        if (results.isEmpty()) {
+            return null; // id에 해당하는 결과가 없으면 null 반환
+        } else {
+            return results.get(0); // 결과가 있을 경우 첫 번째 결과 반환
+        }
     }
 
     // ScheduleRowMapper 내부 클래스:

@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 // @RestController 어노테이션:
@@ -61,11 +62,15 @@ public class ScheduleController {
         LocalDateTime parsedUpdatedAt = null;
 
         // updatedAt이 null이 아닌 경우, 문자열을 LocalDateTime으로 변환.
-        if (updatedAt != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-            // updatedAt 문자열을 LocalDateTime으로 변환하기 위해 DateTimeFormatter를 사용.
+        try {
+            if (updatedAt != null) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+                // updatedAt 문자열을 LocalDateTime으로 변환하기 위해 DateTimeFormatter를 사용.
 
-            parsedUpdatedAt = LocalDateTime.parse(updatedAt, formatter);
+                parsedUpdatedAt = LocalDateTime.parse(updatedAt, formatter);
+            }
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().build(); // 400 Bad Request 반환
         }
 
         // 필터링된 일정 목록을 ScheduleDTO로 반환.
