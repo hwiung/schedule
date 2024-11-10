@@ -200,25 +200,6 @@ API, ERD, SQL을 만들어서 기초적인 설계를 작업을하여 API 설계�
 ![ERD Diagram](./erd-diagram.jpg)
 
 ## 공통 적용 사항
-    1. API 실행 및 테스트(포스트맨), Entity를 DTO에 담아서 반환하기.
-        - Entity의 데이터를 API에 선택적으로 반환해야 하는 경우, 해당 반환 조건에 맞는 DTO 객체에 담아서 반환.
-
-    2. 일정 작성, 수정, 조회 시 비밀번호가 반환 되지 않게 하기.
-
-    3. 일정 수정 및 삭제 시 선택된 일정의 비밀번호와 수신 받은 비밀번호가 일치할 경우에만 결과가 반환 되게 하기.
-        - 비밀번호 불일치 시 적절한 오류 코드 및 메세지를 반환.
-
-    4. 일정 생성, 수정, 삭제 시 적절한 상태 코드를 반환.
-
-    5. 3 Layer Architecture.
-        - Controller, Service, Repositery 계층을 분리하여 구현.
-            -> 각각 가장 위, 중간, 가장 밑에 위치하며 각 계층은 상호작용을 함.
-
-    6. JDBC 사용
-        - ScheduleRepository 클래스의 save, findAll, findById 메서드에서 JDBC 코드를 작성 후, JdbcTemplate을 통해 SQL 쿼리를 사용하여 데이터 베이스에 연동함(JDBC를 직접적으로 사용).
-            -> ScheduleService와 ScheduleController 클래스는 데이터 베이스에 연동된 데이터를 사용함(JDBC를 간접적으로 사용).
-
-## 공통 적용 사항
     1. API 실행 및 테스트(포스트맨)하기, Entity를 DTO에 담아서 반환하기.
         - Entity의 데이터를 API에 선택적으로 반환해야 하는 경우, 해당 반환 조건에 맞는 DTO 객체에 담아서 반환.
 
