@@ -33,10 +33,6 @@ public class ScheduleDTO {
         this.updatedAt = updatedAt;
     }
 
-    // Getter 메서드만 생성:
-    //  - 필드 값을 반환(변경 방지를 위해 Setter는 제외).
-    //  - DTO는 데이터 반환용으로 사용하는 것이기 때문에, Getter 메서드만 사용할 것임.
-
     // 일정의 고유 ID를 반환하는 메서드
     public Long getId() {
         return id;

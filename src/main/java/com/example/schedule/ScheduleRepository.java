@@ -73,10 +73,6 @@ public class ScheduleRepository {
         }
     }
 
-    // ScheduleRowMapper 내부 클래스:
-    //  - ResultSet의 데이터를 ScheduleEntity 객체로 매핑함.
-    //  - SQL 쿼리 결과를 ScheduleEntity 객체로 변환함.
-    //  - findAll, findById 등에서 쿼리 결과를 ScheduleEntity 객체로 변환할 때 사용됨.
     private static class ScheduleRowMapper implements RowMapper<ScheduleEntity> {
 
         // @Override 어노테이션:
@@ -103,8 +99,6 @@ public class ScheduleRepository {
             schedule.setCreatedAt(rs.getTimestamp("createdAt").toLocalDateTime());  // 생성일
             schedule.setUpdatedAt(rs.getTimestamp("updatedAt").toLocalDateTime());  // 수정일
 
-            // 매핑된 ScheduleEntity 객체 반환:
-            //  - mapRow 메서드는 ScheduleEntity 객체를 반환하여 쿼리 결과의 각 행이 ScheduleEntity 객체로 변환되게 함.
             return schedule;
         }
     }
