@@ -1,5 +1,6 @@
 package com.example.schedule;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 // @RestController 어노테이션:
 //  - 클래스가 RESTful 웹 서비스의 컨트롤러 역할을 하며, 클라이언트의 요청을 처리하고 JSON 형식으로 응답을 반환하게 함.
@@ -93,5 +95,11 @@ public class ScheduleController {
         ScheduleDTO schedule = scheduleService.getScheduleById(id);
         // 일정이 존재할 경우 '200 OK'로 응답하고, 없을 경우엔 '404 Not Found'로 응답함.
         return schedule != null ? ResponseEntity.ok(schedule) : ResponseEntity.notFound().build();
+    }
+
+    // NoSuchElementException 발생 시 404 응답을 반환하는 핸들러
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<String> handleNoSuchElementException(NoSuchElementException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }

@@ -52,13 +52,11 @@ public class ScheduleRepository {
 
     // 일정 저장 메서드: ScheduleEntity 객체를 데이터베이스에 삽입
     public int save(ScheduleEntity schedule) {
-        String sql = "INSERT INTO schedule (task, author, password, creadtedAt, updatedAt) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO schedule (task, author, password) VALUES (?, ?, ?)";
         return jdbcTemplate.update(sql,
                 schedule.getTask(),
                 schedule.getAuthor(),
-                schedule.getPassword(),
-                schedule.getCreatedAt(),
-                schedule.getUpdatedAt()
+                schedule.getPassword()
         );
     }
 
@@ -103,4 +101,3 @@ public class ScheduleRepository {
         }
     }
 }
-
