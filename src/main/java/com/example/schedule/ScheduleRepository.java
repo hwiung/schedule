@@ -3,6 +3,7 @@ package com.example.schedule;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -60,44 +61,51 @@ public class ScheduleRepository {
         );
     }
 
-    public ScheduleEntity findById(Long id) {
-        String sql = "SELECT * FROM schedule WHERE id = ?";
-        List<ScheduleEntity> results = jdbcTemplate.query(sql, new Object[]{id}, new ScheduleRowMapper());
-
-        if (results.isEmpty()) {
-            return null; // id에 해당하는 결과가 없으면 null 반환
-        } else {
-            return results.get(0); // 결과가 있을 경우 첫 번째 결과 반환
-        }
+    // 일정 수정 메서드: 일정 내용과 작성자 이름만 수정
+    public int update(Long id, String task, String author, String password) {
+        String sql = "UPDATE schedule SET task = ?, author = ?, updatedAt = ? WHERE id = ? AND password = ?";
+        return jdbcTemplate.update(sql, task, author, LocalDateTime.now(), id, password);
     }
 
-    private static class ScheduleRowMapper implements RowMapper<ScheduleEntity> {
+    // 일정 삭제 메서드: ID와 비밀번호를 확인하여 일정 삭제
+    public int delete(Long id, String password) {
+        String sql = "DELETE FROM schedule WHERE id = ? AND password = ?";
+        return jdbcTemplate.update(sql, id, password);
+    }
 
-        // @Override 어노테이션:
-        //  - 부모 클래스나 인터페이스에 정의된 메서드를 재정의할 때 사용함.
-        //  - RowMapper 인터페이스에 정의된 mapRow 메서드를 재정의하고, ResultSet 데이터를 ScheduleEntity 객체로 매핑함.
-        @Override
+        // 일정 조회 메서드: ID로 일정 찾기.
+        public ScheduleEntity findById (Long id) {
+            String sql = "SELECT * FROM schedule WHERE id = ?";
+            List<ScheduleEntity> results = jdbcTemplate.query(sql, new Object[]{id}, new ScheduleRowMapper());
+            return results.isEmpty() ? null : results.get(0);
+        }
 
-        // mapRow 메서드:
-        //  - ResultSet에서 한 행씩 데이터를 읽고 ScheduleEntity 객체로 변환함.
-        //  - rs: 현재 행의 데이터를 포함한 ResultSet 객체.
-        //  - rowNum: ResultSet에서 현재 행의 순번(0부터 시작함).
-        public ScheduleEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
+        private static class ScheduleRowMapper implements RowMapper<ScheduleEntity> {
 
-            // 새로운 ScheduleEntity 객체 생성:
-            //  - 새로 생성된 ScheduleEntity 객체에 ResultSet의 열 데이터를 각 필드에 설정하여 반환함.
-            ScheduleEntity schedule = new ScheduleEntity();
+            // @Override 어노테이션:
+            //  - 부모 클래스나 인터페이스에 정의된 메서드를 재정의할 때 사용함.
+            //  - RowMapper 인터페이스에 정의된 mapRow 메서드를 재정의하고, ResultSet 데이터를 ScheduleEntity 객체로 매핑함.
+            @Override
 
-            // ResultSet의 열 데이터를 ScheduleEntity 객체의 필드에 매핑함.
-            // 각 필드에 ResultSet의 열 값을 가져와서 설정함.
-            schedule.setId(rs.getLong("id"));   // 일정 고유 ID
-            schedule.setTask(rs.getString("task")); // 일정 내용
-            schedule.setAuthor(rs.getString("author")); // 작성자 이름
-            schedule.setAuthor(rs.getString("password")); // 수정/삭제 시 필요한 비밀번호
-            schedule.setCreatedAt(rs.getTimestamp("createdAt").toLocalDateTime());  // 생성일
-            schedule.setUpdatedAt(rs.getTimestamp("updatedAt").toLocalDateTime());  // 수정일
+            // mapRow 메서드:
+            //  - ResultSet에서 한 행씩 데이터를 읽고 ScheduleEntity 객체로 변환함.
+            //  - rs: 현재 행의 데이터를 포함한 ResultSet 객체.
+            //  - rowNum: ResultSet에서 현재 행의 순번(0부터 시작함).
+            public ScheduleEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-            return schedule;
+                // 새로운 ScheduleEntity 객체 생성:
+                //  - 새로 생성된 ScheduleEntity 객체에 ResultSet의 열 데이터를 각 필드에 설정하여 반환함.
+                ScheduleEntity schedule = new ScheduleEntity();
+
+                // ResultSet의 열 데이터를 ScheduleEntity 객체의 필드에 매핑함.
+                // 각 필드에 ResultSet의 열 값을 가져와서 설정함.
+                schedule.setId(rs.getLong("id"));   // 일정 고유 ID
+                schedule.setTask(rs.getString("task")); // 일정 내용
+                schedule.setAuthor(rs.getString("author")); // 작성자 이름
+                schedule.setPassword(rs.getString("password")); // 수정/삭제 시 필요한 비밀번호
+                schedule.setCreatedAt(rs.getTimestamp("createdAt").toLocalDateTime());  // 생성일
+                schedule.setUpdatedAt(rs.getTimestamp("updatedAt").toLocalDateTime());  // 수정일
+                return schedule;
+            }
         }
     }
-}

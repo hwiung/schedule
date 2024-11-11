@@ -97,6 +97,33 @@ public class ScheduleController {
         return schedule != null ? ResponseEntity.ok(schedule) : ResponseEntity.notFound().build();
     }
 
+    // 일정 수정 엔드포인트: 클라이언트가 전달한 일정 ID와 데이터로 일정을 수정하는 로직
+    // - HTTP 메서드: PUT
+    // - URL: /api/schedules/{id}
+    //  - RequestBody: 수정할 일정의 내용, 작성자 이름, 비밀번호를 포함하는 ScheduleEntity 객체
+    //  - 반환값: 수정된 ScheduleDTO 객체를 200(OK) 상태 코드와 함께 반환, 비밀번호가 일치하지 않거나 일정이 없으면 403 또는 404 반환
+    @PutMapping("/{id}")
+    public ResponseEntity<ScheduleDTO> updateSchedule(
+            @PathVariable Long id,
+            @RequestBody ScheduleEntity schedule
+    ) {
+        ScheduleDTO updatedSchedule = scheduleService.updateSchedule(id, schedule);
+        return ResponseEntity.ok(updatedSchedule);
+    }
+
+    // 일정 삭제 엔드포인트: 일정 ID를 사용하여 특정 일정을 삭제함
+    //  - HTTP 메서드: DELETE
+    //  - URL: /api/schedules/{id}
+    //  - 반환값: 204 No Content 상태 코드 반환, 비밀번호가 일치하지 않거나 일정이 없으면 403 또는 404 반환
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteSchedule(
+            @PathVariable Long id,
+            @RequestParam String password
+    ) {
+        scheduleService.deleteSchedule(id, password);
+        return ResponseEntity.noContent().build();
+    }
+
     // NoSuchElementException 발생 시 404 응답을 반환하는 핸들러
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<String> handleNoSuchElementException(NoSuchElementException ex) {

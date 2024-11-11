@@ -53,9 +53,9 @@ public class ScheduleService {
     //  - 필터링 옵션:
     //      - author: 특정 작성자로 필터링
     //      - updatedAt: 특정 수정일자로 필터링
-    public List<ScheduleDTO> getAllSchedules(String author, LocalDateTime updatedAt) {
 
-        // 일정 목록 조회(ScheduleEntity 반환)
+    // 일정 목록 조회(ScheduleEntity 반환)
+    public List<ScheduleDTO> getAllSchedules(String author, LocalDateTime updatedAt) {
         List<ScheduleEntity> schedules = scheduleRepository.findAll(author, updatedAt);
 
         //ScheduleEntity 객체를 ScheduleDTO로 변환하여 반환
@@ -91,4 +91,44 @@ public class ScheduleService {
                 schedule.getUpdatedAt()
         );
     }
+
+    // 일정 수정 메서드: 클라이언트가 전달한 일정 ID와 데이터로 일정을 수정하는 로직
+    // - HTTP 메서드: PUT
+    // - URL: /api/schedules/{id}
+    //  - RequestBody: 수정할 일정의 내용, 작성자 이름, 비밀번호를 포함하는 ScheduleEntity 객체
+    //  - 반환값: 수정된 ScheduleDTO 객체를 200(OK) 상태 코드와 함께 반환, 비밀번호가 일치하지 않거나 일정이 없으면 403 또는 404 반환
+    public ScheduleDTO updateSchedule(Long id, ScheduleEntity schedule) {
+        // 기존 일정 조회 및 검증
+        ScheduleEntity existingSchedule = scheduleRepository.findById(id);
+        if (existingSchedule == null || !existingSchedule.getPassword().equals(schedule.getPassword())) {
+            throw new NoSuchElementException("일정이 존재하지 않거나 비밀번호가 일치하지 않습니다.");
+        }
+
+        // 업데이트할 항목만 변경
+        existingSchedule.setTask(schedule.getTask());
+        existingSchedule.setAuthor(schedule.getAuthor());
+        existingSchedule.setUpdatedAt(LocalDateTime.now());
+        scheduleRepository.update(existingSchedule.getId(), existingSchedule.getTask(), existingSchedule.getAuthor(), existingSchedule.getPassword());
+        // 데이터베이스 업데이트 후 DTO 변환하여 반환
+        return new ScheduleDTO(
+                existingSchedule.getId(),
+                existingSchedule.getTask(),
+                existingSchedule.getAuthor(),
+                existingSchedule.getCreatedAt(),
+                existingSchedule.getUpdatedAt()
+        );
+    }
+
+    // 일정 삭제 메서드: 일정 ID를 사용하여 특정 일정을 삭제함
+    //  - HTTP 메서드: DELETE
+    //  - URL: /api/schedules/{id}
+    //  - 반환값: 204 No Content 상태 코드 반환, 비밀번호가 일치하지 않거나 일정이 없으면 403 또는 404 반환
+    public void deleteSchedule(Long id, String password) {
+        int rowsAffected = scheduleRepository.delete(id, password);
+        if (rowsAffected == 0) {
+            throw new NoSuchElementException("일정이 존재하지 않거나 비밀번호가 일치하지 않습니다.");
+        }
+    }
 }
+
+
